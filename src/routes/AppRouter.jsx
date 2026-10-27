@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import NotFound from "../containers/NotFound/NotFound";
-import Home from "../containers/Home/Home";
 import Spinner from "../components/Loading/Spinner";
 import { useState } from "react";
+import HomeMap from "../containers/Home/HomeMap";
 
 function AppRouter() {
   //   const { isAuthenticated, loading } = useAuth();
@@ -14,7 +14,7 @@ function AppRouter() {
     <>
       <Routes>
         {/*Rutas siempre accesibles*/}
-        <Route path='/' element={<Home />} />
+        <Route path='/' element={<HomeMap />} />
         {/* Ruta privada */}
         {/* <Route
           path='/mi-perfil'
