@@ -57,6 +57,9 @@ const HomeMap = () => {
       <IconButton
         onClick={handleGetLocation}
         sx={{
+          position: 'fixed',
+          bottom: 20,
+          right: 16,
           bgcolor: "rgba(255, 255, 255, 0.9)",
           color: "#e91e63",
           boxShadow: "0 4px 14px rgba(0,0,0,0.12)",
