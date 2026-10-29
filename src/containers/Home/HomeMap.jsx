@@ -8,18 +8,68 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 
-import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
+import {
+  AdvancedMarker,
+  APIProvider,
+  Map,
+  Marker,
+  useMap,
+} from "@vis.gl/react-google-maps";
 import { customMapStyle } from "../../theme/mapStyles";
 import SearchBarHome from "../../components/Home/SearchBarHome";
 import Chips from "../../components/Home/Chips";
-
+import MyLocationIcon from "@mui/icons-material/MyLocation";
+import UserLocationMarker from "../../components/userLocation/UserLocation";
+import Fab from "@mui/material/Fab";
 // Coordenadas iniciales (Toluca)
 const defaultCenter = { lat: 19.2826, lng: -99.6557 };
 
 const HomeMap = () => {
   const [activeFilter, setActiveFilter] = useState("todos");
+  const [userLocation, setUserLocation] = useState(null);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+  const mapId = import.meta.env.VITE_GOOGLE_MAPS_ID || "";
+  const MapController = ({ userLocation, setUserLocation }) => {
+    const map = useMap();
 
+    const handleGetLocation = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const coords = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            setUserLocation(coords);
+            if (map) {
+              map.panTo(coords);
+              map.setZoom(15);
+            }
+          },
+          (error) => {
+            console.error("Error obteniendo ubicación:", error);
+          },
+        );
+      }
+    };
+
+    return (
+      <IconButton
+        onClick={handleGetLocation}
+        sx={{
+          bgcolor: "rgba(255, 255, 255, 0.9)",
+          color: "#e91e63",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.12)",
+          p: 1.5,
+          backdropFilter: "blur(10px)",
+          mb: 0,
+          "&:hover": { bgcolor: "#ffffff" },
+        }}
+      >
+        <MyLocationIcon />
+      </IconButton>
+    );
+  };
   return (
     <APIProvider apiKey={apiKey}>
       <Box
@@ -44,12 +94,17 @@ const HomeMap = () => {
           <Map
             defaultCenter={defaultCenter}
             defaultZoom={14}
+            mapId={mapId}
             gestureHandling={"greedy"}
             disableDefaultUI={true}
-            styles={customMapStyle}
+            // styles={customMapStyle}
             style={{ width: "100%", height: "100%" }}
           >
-            <Marker position={defaultCenter} />
+            {userLocation && (
+              <AdvancedMarker position={userLocation}>
+                <UserLocationMarker />
+              </AdvancedMarker>
+            )}
           </Map>
         </Box>
 
@@ -142,7 +197,22 @@ const HomeMap = () => {
                 setActiveFilter={setActiveFilter}
               />
             </Grid>
+            {/* Botón flotante para pedir geolocalización */}
           </Grid>
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 30,
+              right: 30,
+              zIndex: 20,
+              pointerEvents: "auto",
+            }}
+          >
+            <MapController
+              userLocation={userLocation}
+              setUserLocation={setUserLocation}
+            />
+          </Box>
         </Box>
       </Box>
     </APIProvider>
